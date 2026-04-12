@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>FUTObot — Student Chat Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+
+    <style>
+        :root {
+            --bg-page        : #ffffff;
+            --bg-sidebar     : #0e3d20;
+            --bg-header      : #ffffff;
+            --bg-messages    : #f9fafb;
+            --bg-input-bar   : #ffffff;
+            --bg-input-wrap  : #f3f4f6;
+            --bg-bot-bubble  : #edf7f1;
+            --bg-user-bubble : #1a7a3c;
+            --bg-card        : rgba(255,255,255,0.07);
+            --bg-quick-btn   : rgba(255,255,255,0.07);
+            --bg-pill        : #edf7f1;
+            --bg-stat-card   : #f3f4f6;
+            --text-primary   : #111827;
+            --text-secondary : #6b7280;
+            --text-muted     : #9ca3af;
+            --text-sidebar   : rgba(255,255,255,0.90);
+            --text-sidebar-m : rgba(255,255,255,0.50);
+            --text-bot-bubble: #0e3d20;
+            --text-user-bubble:#ffffff;
+            --border-main    : #e5e7eb;
+            --border-sidebar : rgba(255,255,255,0.12);
+            --border-input   : #e5e7eb;
+            --border-bot-b   : rgba(26,122,60,0.15);
+            --accent         : #1a7a3c;
+            --accent-mid     : #27a04f;
+            --accent-dark    : #0e3d20;
+            --accent-gold    : #f5a623;
+            --accent-light   : #edf7f1;
+            --accent-pill-txt: #1a7a3c;
+            --shadow-bubble  : 0 2px 8px rgba(0,0,0,0.05);
+            --shadow-header  : 0 1px 8px rgba(0,0,0,0.04);
+            --radius-lg      : 18px;
+            --radius-md      : 12px;
+            --radius-sm      : 8px;
+            --radius-pill    : 50px;
+            --font-display   : 'Sora', sans-serif;
+            --font-body      : 'DM Sans', sans-serif;
+            --transition     : 0.22s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg-page        : #0f172a;
+            --bg-sidebar     : #020c05;
+            --bg-header      : #1e293b;
+            --bg-messages    : #0f172a;
+            --bg-input-bar   : #1e293b;
+            --bg-input-wrap  : #334155;
+            --bg-bot-bubble  : #1e3a28;
+            --bg-user-bubble : #16653a;
+            --bg-card        : rgba(255,255,255,0.05);
+            --bg-quick-btn   : rgba(255,255,255,0.05);
+            --bg-pill        : rgba(26,122,60,0.25);
+            --bg-stat-card   : #1e293b;
+            --text-primary   : #f1f5f9;
+            --text-secondary : #94a3b8;
+            --text-muted     : #64748b;
+            --text-sidebar   : rgba(255,255,255,0.88);
+            --text-sidebar-m : rgba(255,255,255,0.40);
+            --text-bot-bubble: #d1fae5;
+            --text-user-bubble:#ffffff;
+            --border-main    : #334155;
+            --border-sidebar : rgba(255,255,255,0.08);
+            --border-input   : #475569;
+            --border-bot-b   : rgba(52,211,153,0.15);
+            --accent         : #34d399;
+            --accent-mid     : #6ee7b7;
+            --accent-dark    : #d1fae5;
+            --accent-gold    : #fbbf24;
+            --accent-light   : rgba(52,211,153,0.12);
+            --accent-pill-txt: #34d399;
+            --shadow-bubble  : 0 2px 8px rgba(0,0,0,0.25);
+            --shadow-header  : 0 1px 8px rgba(0,0,0,0.3);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            height: 100%;
+            font-family: var(--font-body);
+            background: var(--bg-page);
+            color: var(--text-primary);
+            overflow: hidden;
+            transition: background var(--transition), color var(--transition);
+        }
+
+        .page-wrapper { display: flex; height: 100vh; overflow: hidden; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 285px; min-width: 285px;
+            background: var(--bg-sidebar);
+            display: flex; flex-direction: column;
+            height: 100vh; overflow-y: auto;
+            transition: background var(--transition);
+        }
+
+        .sidebar-logo {
+            background: var(--accent);
+            padding: 22px 18px 18px;
+            text-align: center; position: relative; overflow: hidden; flex-shrink: 0;
+        }
+        .sidebar-logo::before {
+            content:''; position:absolute; inset:0;
+            background:radial-gradient(circle at 70% 30%,rgba(255,255,255,.10) 0%,transparent 70%);
+            pointer-events:none;
+        }
+        .logo-icon {
+            width:60px; height:60px; border-radius:50%; background:var(--bg-page);
+            display:flex; align-items:center; justify-content:center;
+            margin:0 auto 10px; font-size:28px; box-shadow:0 4px 16px rgba(0,0,0,0.25);
+        }
+        .sidebar-logo h1 { font-family:var(--font-display); font-size:1.1rem; font-weight:800; color:#fff; letter-spacing:.02em; }
+        .sidebar-logo p  { font-size:.68rem; color:rgba(255,255,255,.72); margin-top:2px; letter-spacing:.05em; }
+
+        .profile-card {
+            margin:16px 14px; background:var(--bg-card);
+            border:1px solid var(--border-sidebar); border-radius:var(--radius-md); padding:14px;
+        }
+        .profile-card .avatar {
+            width:44px; height:44px; border-radius:50%; background:var(--accent-gold);
+            display:flex; align-items:center; justify-content:center;
+            font-family:var(--font-display); font-weight:700; font-size:1.1rem; color:#0e3d20; flex-shrink:0;
+        }
+        .profile-card .p-label { font-size:.6rem; color:var(--text-sidebar-m); text-transform:uppercase; letter-spacing:.08em; margin-bottom:1px; }
+        .profile-card .p-value { font-size:.8rem; font-weight:600; color:var(--text-sidebar); word-break:break-word; margin-bottom:7px; line-height:1.3; }
+
+        .quick-actions { padding:0 14px; }
+        .quick-actions h6 { font-family:var(--font-display); font-size:.62rem; text-transform:uppercase; letter-spacing:.1em; color:var(--text-sidebar-m); margin-bottom:8px; }
+
+        .quick-btn {
+            display:flex; align-items:center; gap:10px; width:100%;
+            background:var(--bg-quick-btn); border:1px solid var(--border-sidebar);
+            border-radius:var(--radius-sm); color:var(--text-sidebar);
+            font-family:var(--font-body); font-size:.8rem; font-weight:500;
+            padding:9px 12px; margin-bottom:5px; cursor:pointer;
+            transition:var(--transition); text-align:left;
+        }
+        .quick-btn:hover { background:var(--accent); border-color:var(--accent); color:#fff; transform:translateX(3px); }
+        .quick-btn i { font-size:.95rem; opacity:.8; }
+
+        .analytics-panel {
+            margin:14px; background:var(--bg-card);
+            border:1px solid var(--border-sidebar); border-radius:var(--radius-md); padding:12px;
+        }
+        .analytics-panel h6 { font-family:var(--font-display); font-size:.6rem; text-transform:uppercase; letter-spacing:.1em; color:var(--text-sidebar-m); margin-bottom:10px; }
+        .stat-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+        .stat-row .s-label { font-size:.72rem; color:var(--text-sidebar-m); }
+        .stat-row .s-val   { font-size:.78rem; font-weight:700; color:var(--text-sidebar); }
+
+        .sidebar-footer {
+            padding:12px 14px; border-top:1px solid var(--border-sidebar);
+            font-size:.63rem; color:var(--text-sidebar-m); text-align:center; margin-top:auto;
+        }
+
+        /* CHAT AREA */
+        .chat-area {
+            flex:1; display:flex; flex-direction:column;
+            height:100vh; overflow:hidden;
+            background:var(--bg-page); transition:background var(--transition);
+        }
+
+        .chat-header {
+            background:var(--bg-header); border-bottom:1px solid var(--border-main);
+            padding:12px 22px; display:flex; align-items:center; justify-content:space-between;
+            flex-shrink:0; box-shadow:var(--shadow-header);
+            transition:background var(--transition), border-color var(--transition);
+        }
+        .bot-info { display:flex; align-items:center; gap:12px; }
+        .bot-avatar {
+            width:40px; height:40px; border-radius:50%;
+            background:linear-gradient(135deg, var(--accent), var(--accent-mid));
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.2rem; position:relative; flex-shrink:0;
+        }
+        .bot-avatar::after {
+            content:''; width:9px; height:9px; border-radius:50%;
+            background:#22c55e; border:2px solid var(--bg-header);
+            position:absolute; bottom:1px; right:1px;
+        }
+        .bot-name   { font-family:var(--font-display); font-weight:700; font-size:.92rem; color:var(--text-primary); }
+        .bot-status { font-size:.7rem; color:var(--accent-mid); font-weight:500; }
+        .header-actions { display:flex; align-items:center; gap:8px; }
+        .hdr-btn {
+            width:34px; height:34px; border-radius:50%; background:var(--accent-light);
+            border:1px solid var(--border-bot-b); color:var(--accent);
+            display:flex; align-items:center; justify-content:center;
+            font-size:.95rem; cursor:pointer; transition:var(--transition);
+        }
+        .hdr-btn:hover { background:var(--accent); color:#fff; transform:scale(1.08); }
+        #darkModeToggle { background:var(--bg-stat-card); border-color:var(--border-main); color:var(--text-secondary); }
+        #darkModeToggle:hover { background:var(--accent); color:#fff; }
+
+        /* MESSAGES — flex:1 + overflow-y:auto, NO scroll-behavior smooth */
+        .messages-window {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 22px 18px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: var(--bg-messages);
+            transition: background var(--transition);
+        }
+        .messages-window::-webkit-scrollbar { width:4px; }
+        .messages-window::-webkit-scrollbar-track { background:transparent; }
+        .messages-window::-webkit-scrollbar-thumb { background:var(--border-main); border-radius:10px; }
+
+        /* THE ANCHOR — permanently last child, zero height */
+        #scrollAnchor { height: 1px; flex-shrink: 0; }
+
+        .date-divider {
+            display:flex; align-items:center; gap:10px;
+            font-size:.65rem; color:var(--text-muted);
+            text-transform:uppercase; letter-spacing:.08em; flex-shrink:0;
+        }
+        .date-divider::before, .date-divider::after { content:''; flex:1; height:1px; background:var(--border-main); }
+
+        .message-row {
+            display:flex; gap:8px; align-items:flex-end;
+            animation:msgIn .25s ease both; flex-shrink:0;
+        }
+        @keyframes msgIn {
+            from { opacity:0; transform:translateY(10px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .message-row.user-row { flex-direction:row-reverse; }
+
+        .bubble {
+            max-width:74%; padding:11px 15px; border-radius:var(--radius-lg);
+            font-size:.87rem; line-height:1.65; box-shadow:var(--shadow-bubble);
+            white-space:pre-wrap; word-break:break-word; position:relative;
+            transition:background var(--transition), color var(--transition);
+        }
+        .bot-bubble  { background:var(--bg-bot-bubble); border:1px solid var(--border-bot-b); border-bottom-left-radius:4px; color:var(--text-bot-bubble); }
+        .user-bubble { background:var(--bg-user-bubble); color:var(--text-user-bubble); border-bottom-right-radius:4px; }
+        .bubble .ts  { display:block; font-size:.6rem; margin-top:5px; opacity:.5; text-align:right; }
+
+        .source-badge {
+            display:inline-block; font-size:.58rem; font-weight:600;
+            border-radius:20px; padding:2px 8px; margin-bottom:5px;
+            letter-spacing:.04em; text-transform:uppercase;
+            background:var(--accent-light); color:var(--accent);
+        }
+        .intent-tag {
+            display:inline-block; font-size:.56rem; font-weight:600;
+            border-radius:20px; padding:1px 7px; margin-bottom:5px; margin-left:4px;
+            letter-spacing:.04em; text-transform:uppercase;
+            background:var(--bg-stat-card); color:var(--text-muted);
+        }
+
+        .feedback-btns { display:flex; gap:4px; margin-top:7px; }
+        .fb-btn {
+            background:transparent; border:1px solid var(--border-bot-b);
+            border-radius:20px; padding:2px 8px; font-size:.7rem;
+            cursor:pointer; color:var(--text-muted); transition:var(--transition);
+        }
+        .fb-btn:hover      { background:var(--accent-light); color:var(--accent); }
+        .fb-btn.voted-up   { background:rgba(34,197,94,.15); color:#16a34a; border-color:#16a34a; }
+        .fb-btn.voted-down { background:rgba(239,68,68,.12); color:#dc2626; border-color:#dc2626; }
+
+        .bot-bubble strong { font-weight:700; color:var(--accent-dark); }
+        [data-theme="dark"] .bot-bubble strong { color:var(--accent-mid); }
+        .bot-bubble table { width:100%; border-collapse:collapse; margin:8px 0; font-size:.79rem; }
+        .bot-bubble th, .bot-bubble td { border:1px solid var(--border-bot-b); padding:5px 9px; text-align:left; }
+        .bot-bubble th { background:var(--accent-light); font-weight:600; color:var(--accent); }
+        .bot-bubble tr:nth-child(even) { background:rgba(0,0,0,.02); }
+        [data-theme="dark"] .bot-bubble tr:nth-child(even) { background:rgba(255,255,255,.03); }
+
+        .typing-indicator { display:none; flex-shrink:0; }
+        .typing-indicator.active { display:flex; align-items:flex-end; gap:8px; }
+        .typing-dots {
+            background:var(--bg-bot-bubble); border:1px solid var(--border-bot-b);
+            border-radius:var(--radius-lg); border-bottom-left-radius:4px;
+            padding:11px 16px; display:flex; gap:5px; align-items:center;
+        }
+        .dot { width:6px; height:6px; border-radius:50%; background:var(--accent); animation:bounce 1.2s infinite; }
+        .dot:nth-child(2) { animation-delay:.18s; }
+        .dot:nth-child(3) { animation-delay:.36s; }
+        @keyframes bounce {
+            0%,80%,100% { transform:translateY(0); opacity:.35; }
+            40%          { transform:translateY(-7px); opacity:1; }
+        }
+
+        .welcome-banner { text-align:center; padding:36px 20px 16px; flex-shrink:0; }
+        .welcome-banner .big-icon { font-size:2.8rem; display:block; margin-bottom:10px; }
+        .welcome-banner h2 { font-family:var(--font-display); font-size:1.25rem; font-weight:800; color:var(--text-primary); margin-bottom:5px; }
+        .welcome-banner p  { font-size:.82rem; color:var(--text-muted); max-width:360px; margin:0 auto; }
+
+        /* INPUT BAR */
+        .input-bar {
+            background:var(--bg-input-bar); border-top:1px solid var(--border-main);
+            padding:14px 18px; flex-shrink:0;
+            transition:background var(--transition), border-color var(--transition);
+        }
+        .input-pills { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:9px; }
+        .pill {
+            font-size:.7rem; background:var(--bg-pill); border:1px solid var(--border-bot-b);
+            color:var(--accent-pill-txt); border-radius:20px; padding:4px 12px;
+            cursor:pointer; font-weight:500; transition:var(--transition); white-space:nowrap;
+        }
+        .pill:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+        .input-wrap {
+            display:flex; align-items:center; background:var(--bg-input-wrap);
+            border:1.5px solid var(--border-input); border-radius:var(--radius-pill);
+            padding:5px 5px 5px 18px; gap:6px;
+            transition:border-color var(--transition), box-shadow var(--transition), background var(--transition);
+        }
+        .input-wrap:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px rgba(26,122,60,.10); background:var(--bg-page); }
+        [data-theme="dark"] .input-wrap:focus-within { box-shadow:0 0 0 3px rgba(52,211,153,.12); }
+
+        #userInput {
+            flex:1; border:none; background:transparent;
+            font-family:var(--font-body); font-size:.88rem; color:var(--text-primary);
+            outline:none; padding:7px 0; transition:color var(--transition);
+        }
+        #userInput::placeholder { color:var(--text-muted); transition:opacity .28s ease; }
+        #userInput.ph-fade::placeholder { opacity:0; }
+
+        .char-count { font-size:.62rem; color:var(--text-muted); white-space:nowrap; padding-right:4px; }
+        .char-count.near-limit { color:#f59e0b; }
+        .char-count.at-limit   { color:#ef4444; }
+
+        .send-btn {
+            width:40px; height:40px; border-radius:50%; background:var(--accent);
+            border:none; color:#fff; display:flex; align-items:center; justify-content:center;
+            font-size:1rem; cursor:pointer; transition:var(--transition); flex-shrink:0;
+        }
+        .send-btn:hover  { background:var(--accent-dark); transform:scale(1.06); }
+        .send-btn:active { transform:scale(.96); }
+        .send-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+
+        .input-hint { text-align:center; margin-top:6px; font-size:.62rem; color:var(--text-muted); }
+        .input-hint kbd {
+            background:var(--bg-stat-card); border:1px solid var(--border-main);
+            border-radius:3px; padding:1px 4px; font-size:.6rem; color:var(--text-secondary);
+        }
+
+        /* MOBILE */
+        .mobile-nav {
+            display:none; background:var(--bg-sidebar); color:#fff;
+            padding:11px 14px; align-items:center; justify-content:space-between; flex-shrink:0;
+        }
+        .mobile-nav .brand { font-family:var(--font-display); font-weight:700; font-size:.88rem; }
+        #mobileMenuBtn { background:transparent; border:none; color:#fff; font-size:1.4rem; cursor:pointer; }
+        .mobile-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:999; }
+        .mobile-overlay.show { display:block; }
+
+        @media (max-width:991.98px) {
+            .sidebar { display:none; }
+            .mobile-nav { display:flex; }
+            .sidebar.mobile-open {
+                display:flex; position:fixed; inset:0 auto 0 0;
+                z-index:1000; width:285px; animation:slideIn .22s ease; height:100vh;
+            }
+            @keyframes slideIn { from { transform:translateX(-100%); } to { transform:translateX(0); } }
+            .bubble { max-width:88%; }
+        }
+        @media (max-width:576px) {
+            .input-pills { display:none; }
+            .header-actions .hdr-btn:not(#darkModeToggle) { display:none; }
+            .chat-header { padding:10px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+
+<nav class="mobile-nav d-lg-none">
+    <button id="mobileMenuBtn" onclick="openSidebar()"><i class="bi bi-list"></i></button>
+    <span class="brand">🤖 FUTObot</span>
+    <button onclick="toggleDark()" style="background:transparent;border:none;color:#fff;font-size:1.1rem;cursor:pointer;">
+        <i class="bi bi-moon-fill" id="darkIconMobile"></i>
+    </button>
+</nav>
+
+<div class="page-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">🤖</div>
+            <h1>FUTObot</h1>
+            <p>STUDENT CHAT SERVICE · FUTO</p>
+        </div>
+
+        <div class="profile-card">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <div class="avatar" id="avatarEl">ST</div>
+                <div>
+                    <div class="p-label">Student</div>
+                    <div class="p-value" id="profileName" style="margin-bottom:0">{{ student.full_name }}</div>
+                </div>
+            </div>
+            <div class="p-label">Registration No.</div>
+            <div class="p-value" id="profileReg">{{ student.reg_number }}</div>
+            <div class="p-label">Department</div>
+            <div class="p-value">{{ student.department }}</div>
+            <div class="p-label">Level / Session</div>
+            <div class="p-value" style="margin-bottom:0">{{ student.level }} &nbsp;·&nbsp; {{ student.session }}</div>
+        </div>
+
+        <div class="quick-actions">
+            <h6>Quick Questions</h6>
+            <button class="quick-btn" onclick="quickAsk('How do I register my courses at FUTO?')"><i class="bi bi-book-half"></i>Course Registration</button>
+            <button class="quick-btn" onclick="quickAsk('How do I pay my school fees at FUTO?')"><i class="bi bi-cash-coin"></i>School Fees</button>
+            <button class="quick-btn" onclick="quickAsk('How do I check my semester results?')"><i class="bi bi-bar-chart-line"></i>Check Results</button>
+            <button class="quick-btn" onclick="quickAsk('Tell me about hostel accommodation at FUTO')"><i class="bi bi-house-door"></i>Hostel Info</button>
+            <button class="quick-btn" onclick="quickAsk('Where can I find my class timetable?')"><i class="bi bi-calendar3"></i>Timetable</button>
+            <button class="quick-btn" onclick="quickAsk('What are the FUTO exam rules?')"><i class="bi bi-pencil-square"></i>Exam Rules</button>
+            <button class="quick-btn" onclick="quickAsk('How do I get my academic transcript?')"><i class="bi bi-file-earmark-text"></i>Transcript</button>
+            <button class="quick-btn" onclick="quickAsk('What scholarships are available at FUTO?')"><i class="bi bi-trophy"></i>Scholarships</button>
+            <button class="quick-btn" onclick="quickAsk('How do I calculate my GPA at FUTO?')"><i class="bi bi-calculator"></i>GPA Calculator</button>
+            <button class="quick-btn" onclick="quickAsk('FUTO portal login problem, I cannot access my account')"><i class="bi bi-laptop"></i>Portal Help</button>
+        </div>
+
+        <div class="analytics-panel">
+            <h6>📊 Session Analytics</h6>
+            <div class="stat-row"><span class="s-label">Messages sent</span><span class="s-val" id="statMsgs">0</span></div>
+            <div class="stat-row"><span class="s-label">AI fallbacks used</span><span class="s-val" id="statFallback">0</span></div>
+            <div class="stat-row"><span class="s-label">Model accuracy</span><span class="s-val" id="statAcc">{{ model_acc }}</span></div>
+            <div class="stat-row"><span class="s-label">Uptime</span><span class="s-val" id="statUptime">—</span></div>
+            <div class="stat-row"><span class="s-label">👍 / 👎 Feedback</span><span class="s-val"><span id="statUp">0</span> / <span id="statDown">0</span></span></div>
+        </div>
+
+        <div class="sidebar-footer">
+            3-Layer AI: Rules → ML → MyMemory &nbsp;·&nbsp; CLINC150 + FUTO KB<br/>
+            Powered by Python 3.13 · Flask · scikit-learn
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="chat-area">
+
+        <header class="chat-header">
+            <div class="bot-info">
+                <div class="bot-avatar">🤖</div>
+                <div>
+                    <div class="bot-name">FUTObot — Student Assistant</div>
+                    <div class="bot-status" id="botStatus">Online · Ready to help</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="hdr-btn" id="darkModeToggle" onclick="toggleDark()" title="Toggle dark/light mode">
+                    <i class="bi bi-moon-fill" id="darkIcon"></i>
+                </button>
+                <button class="hdr-btn" onclick="exportChat()" title="Export conversation"><i class="bi bi-download"></i></button>
+                <button class="hdr-btn" onclick="clearChat()" title="Clear conversation"><i class="bi bi-trash3"></i></button>
+            </div>
+        </header>
+
+        <div class="messages-window" id="messagesWindow">
+
+            <div class="welcome-banner" id="welcomeBanner">
+                <span class="big-icon">🎓</span>
+                <h2>Welcome to FUTO Student Services</h2>
+                <p>Your AI-powered academic assistant is ready. Ask anything about FUTO!</p>
+            </div>
+
+            <div class="date-divider" id="dateDivider" style="display:none">
+                <span id="todayLabel"></span>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="bot-avatar" style="width:30px;height:30px;font-size:.85rem;flex-shrink:0;">🤖</div>
+                <div class="typing-dots">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+            </div>
+
+            <!--
+                SCROLL ANCHOR — always the very last element in the list.
+                Every new message is inserted BEFORE this div.
+                Calling anchor.scrollIntoView() is the most reliable
+                cross-browser way to jump to the bottom of a flex column.
+            -->
+            <div id="scrollAnchor"></div>
+
+        </div>
+
+        <div class="input-bar">
+            <div class="input-pills">
+                <span class="pill" onclick="quickAsk('How do I register courses?')">📚 Registration</span>
+                <span class="pill" onclick="quickAsk('What is the school fees?')">💰 Fees</span>
+                <span class="pill" onclick="quickAsk('Show my class timetable')">🗓️ Timetable</span>
+                <span class="pill" onclick="quickAsk('Check my results')">📊 Results</span>
+                <span class="pill" onclick="quickAsk('Hostel information at FUTO')">🏠 Hostel</span>
+                <span class="pill" onclick="quickAsk('FUTO exam rules')">✏️ Exams</span>
+                <span class="pill" onclick="quickAsk('How to calculate my GPA')">📐 GPA</span>
+                <span class="pill" onclick="quickAsk('Available scholarships FUTO')">🏆 Scholarship</span>
+            </div>
+
+            <div class="input-wrap">
+                <input type="text" id="userInput" placeholder="Ask me anything about FUTO…" autocomplete="off" maxlength="300"/>
+                <span class="char-count" id="charCount">0/300</span>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send (Enter)">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </div>
+
+            <div class="input-hint">
+                Press <kbd>Enter</kbd> to send &nbsp;·&nbsp;
+                FUTObot uses AI — verify critical info on <strong>portal.futo.edu.ng</strong>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+    // ── 1. DARK MODE ──────────────────────────────────────────────
+    const htmlEl = document.documentElement;
+
+    function applyTheme(dark) {
+        htmlEl.setAttribute("data-theme", dark ? "dark" : "light");
+        ["darkIcon","darkIconMobile"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.className = dark ? "bi bi-sun-fill" : "bi bi-moon-fill";
+        });
+        localStorage.setItem("futobot-theme", dark ? "dark" : "light");
+    }
+
+    function toggleDark() { applyTheme(htmlEl.getAttribute("data-theme") !== "dark"); }
+    applyTheme(localStorage.getItem("futobot-theme") === "dark");
+
+
+    // ── 2. AVATAR INITIALS ────────────────────────────────────────
+    (function () {
+        const nameEl   = document.getElementById("profileName");
+        const avatarEl = document.getElementById("avatarEl");
+        if (!nameEl || !avatarEl) return;
+        const words = nameEl.textContent.trim().split(/\s+/);
+        avatarEl.textContent = words.slice(0,2).map(w => w[0]||"").join("").toUpperCase() || "ST";
+    })();
+
+
+    // ── 3. DATE LABEL ─────────────────────────────────────────────
+    document.getElementById("todayLabel").textContent =
+        new Date().toLocaleDateString("en-NG", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+
+
+    // ── 4. ANIMATED PLACEHOLDER ───────────────────────────────────
+    const PLACEHOLDERS = [
+        "Ask me anything about FUTO…",
+        "How do I register my courses?",
+        "What is the FUTO school fees for 300 level?",
+        "How do I check my semester results?",
+        "Where can I find my class timetable?",
+        "How do I apply for hostel accommodation?",
+        "What are the exam rules at FUTO?",
+        "How do I get my academic transcript?",
+        "How is GPA calculated at FUTO?",
+        "Tell me about FUTO library e-access.",
+        "How do I complete my student clearance?",
+        "What scholarships are available at FUTO?",
+        "I forgot my portal password — what do I do?",
+        "What is the FUTO hostel fee?",
+        "How many credit units can I register per semester?",
+    ];
+    let phIdx = 0;
+    const inputEl = document.getElementById("userInput");
+    setInterval(() => {
+        if (inputEl.value.length > 0) return;
+        phIdx = (phIdx + 1) % PLACEHOLDERS.length;
+        inputEl.classList.add("ph-fade");
+        setTimeout(() => { inputEl.placeholder = PLACEHOLDERS[phIdx]; inputEl.classList.remove("ph-fade"); }, 280);
+    }, 3200);
+
+
+    // ── 5. CHARACTER COUNTER ──────────────────────────────────────
+    const charCountEl = document.getElementById("charCount");
+    inputEl.addEventListener("input", () => {
+        const len = inputEl.value.length;
+        charCountEl.textContent = `${len}/300`;
+        charCountEl.className = "char-count" + (len>=300?" at-limit":len>=250?" near-limit":"");
+    });
+
+
+    // ── 6. MOBILE SIDEBAR ─────────────────────────────────────────
+    function openSidebar()  { document.getElementById("sidebar").classList.add("mobile-open");    document.getElementById("mobileOverlay").classList.add("show"); }
+    function closeSidebar() { document.getElementById("sidebar").classList.remove("mobile-open"); document.getElementById("mobileOverlay").classList.remove("show"); }
+
+
+    // ── 7. SCROLL TO BOTTOM ───────────────────────────────────────
+    // Strategy: a permanent <div id="scrollAnchor"> lives as the absolute
+    // last child of .messages-window. Every new bubble is inserted BEFORE
+    // it, keeping anchor last. scrollIntoView({block:"end"}) on it is
+    // guaranteed to show the bottom of the chat — works in all browsers,
+    // no scroll-behavior interference, no timing race.
+    function scrollToBottom() {
+        document.getElementById("scrollAnchor").scrollIntoView({ block: "end" });
+    }
+
+
+    // ── 8. MARKDOWN RENDERER ──────────────────────────────────────
+    function renderMarkdown(text) {
+        text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+        text = text.replace(/((?:\|.+\|(?:\n|$))+)/g, (block) => {
+            const rows = block.trim().split("\n");
+            let html = "<table><thead>", headDone = false;
+            for (const row of rows) {
+                if (/^\|[-| :]+\|$/.test(row.trim())) { html += "</thead><tbody>"; headDone = true; continue; }
+                const cells = row.split("|").filter((_,i,a) => i>0 && i<a.length-1);
+                const tag = !headDone ? "th" : "td";
+                html += "<tr>" + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join("") + "</tr>";
+            }
+            return html + (headDone ? "</tbody>" : "</thead>") + "</table>";
+        });
+        text = text.replace(/\n/g, "<br>");
+        return text;
+    }
+
+
+    // ── 9. APPEND MESSAGE ─────────────────────────────────────────
+    let msgCounter = 0;
+
+    function appendMessage(text, sender, meta = {}) {
+        const win    = document.getElementById("messagesWindow");
+        const anchor = document.getElementById("scrollAnchor");
+        msgCounter++;
+
+        document.getElementById("welcomeBanner").style.display = "none";
+        document.getElementById("dateDivider").style.display   = "flex";
+
+        const time = new Date().toLocaleTimeString("en-NG", { hour:"2-digit", minute:"2-digit" });
+        const row  = document.createElement("div");
+        row.className = `message-row ${sender === "user" ? "user-row" : ""}`;
+
+        if (sender === "bot") {
+            const av = document.createElement("div");
+            av.className = "bot-avatar";
+            av.style.cssText = "width:30px;height:30px;font-size:.85rem;flex-shrink:0;";
+            av.textContent = "🤖";
+
+            const bbl = document.createElement("div");
+            bbl.className = "bubble bot-bubble";
+            bbl.id = `msg-${msgCounter}`;
+
+            // Only show KB badge — mymemory/fallback hidden from students
+            if (meta.source === "kb") {
+                const src = document.createElement("span");
+                src.className = "source-badge";
+                src.textContent = "📚 FUTO KB";
+                bbl.appendChild(src);
+                if (meta.intent && meta.intent !== "unknown") {
+                    const itg = document.createElement("span");
+                    itg.className = "intent-tag";
+                    itg.textContent = "🎯 " + meta.intent.replace(/_/g," ");
+                    bbl.appendChild(itg);
+                }
+                bbl.appendChild(document.createElement("br"));
+            }
+
+            const ct = document.createElement("span");
+            ct.innerHTML = renderMarkdown(text);
+            bbl.appendChild(ct);
+
+            const ts = document.createElement("span");
+            ts.className = "ts"; ts.textContent = time;
+            bbl.appendChild(ts);
+
+            const fbRow = document.createElement("div");
+            fbRow.className = "feedback-btns";
+            fbRow.innerHTML = `
+            <button class="fb-btn" onclick="sendFeedback('up',this,${msgCounter})">👍 Helpful</button>
+            <button class="fb-btn" onclick="sendFeedback('down',this,${msgCounter})">👎 Not helpful</button>
+        `;
+            bbl.appendChild(fbRow);
+
+            row.appendChild(av);
+            row.appendChild(bbl);
+
+        } else {
+            const bbl = document.createElement("div");
+            bbl.className = "bubble user-bubble";
+            bbl.textContent = text;
+            const ts = document.createElement("span");
+            ts.className = "ts"; ts.textContent = time;
+            bbl.appendChild(ts);
+            row.appendChild(bbl);
+        }
+
+        // Insert before anchor — anchor stays last always
+        win.insertBefore(row, anchor);
+
+        // Scroll after browser has painted the new element
+        requestAnimationFrame(scrollToBottom);
+    }
+
+
+    // ── 10. FEEDBACK ──────────────────────────────────────────────
+    async function sendFeedback(vote, btn, msgId) {
+        const row = btn.closest(".feedback-btns");
+        if (!row || row.dataset.voted) return;
+        row.dataset.voted = "1";
+        row.querySelectorAll(".fb-btn").forEach(b => b.disabled = true);
+        btn.classList.add(vote === "up" ? "voted-up" : "voted-down");
+        btn.textContent = vote === "up" ? "👍 Thanks!" : "👎 Noted";
+        try { await fetch("/feedback",{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({vote}) }); } catch(_){}
+    }
+
+
+    // ── 11. TYPING INDICATOR ──────────────────────────────────────
+    function showTyping() {
+        document.getElementById("typingIndicator").classList.add("active");
+        document.getElementById("botStatus").textContent = "Typing…";
+        requestAnimationFrame(scrollToBottom);
+    }
+
+    function hideTyping() {
+        document.getElementById("typingIndicator").classList.remove("active");
+        document.getElementById("botStatus").textContent = "Online · Ready to help";
+    }
+
+
+    // ── 12. SEND MESSAGE ──────────────────────────────────────────
+    async function sendMessage() {
+        const text = inputEl.value.trim();
+        if (!text) return;
+
+        inputEl.value = "";
+        inputEl.disabled = true;
+        document.getElementById("sendBtn").disabled = true;
+        charCountEl.textContent = "0/300";
+
+        appendMessage(text, "user");
+        showTyping();
+
+        try {
+            const res = await fetch("/chat", {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                body: JSON.stringify({ message: text }),
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+
+            await new Promise(r => setTimeout(r, 400 + Math.random()*500));
+
+            hideTyping();
+            appendMessage(data.reply, "bot", { intent: data.intent, source: data.source });
+
+        } catch(err) {
+            hideTyping();
+            appendMessage("⚠ Connection error. Make sure the Python server is running and try again.", "bot", {});
+        }
+
+        inputEl.disabled = false;
+        document.getElementById("sendBtn").disabled = false;
+        inputEl.focus();
+    }
+
+
+    // ── 13. QUICK ASK ─────────────────────────────────────────────
+    function quickAsk(q) { inputEl.value = q; closeSidebar(); sendMessage(); }
+
+
+    // ── 14. KEYBOARD ──────────────────────────────────────────────
+    inputEl.addEventListener("keydown", e => { if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); sendMessage(); } });
+
+
+    // ── 15. CLEAR CHAT ────────────────────────────────────────────
+    function clearChat() {
+        if (!confirm("Clear this conversation?")) return;
+        const win = document.getElementById("messagesWindow");
+        [...win.children].forEach(n => {
+            if (!["welcomeBanner","dateDivider","typingIndicator","scrollAnchor"].includes(n.id)) n.remove();
+        });
+        document.getElementById("welcomeBanner").style.display = "block";
+        document.getElementById("dateDivider").style.display   = "none";
+        msgCounter = 0;
+    }
+
+
+    // ── 16. EXPORT CHAT ───────────────────────────────────────────
+    function exportChat() {
+        const bubbles = document.querySelectorAll(".bubble");
+        if (!bubbles.length) { alert("No messages to export yet."); return; }
+
+        const studentName = document.getElementById("profileName")?.textContent.trim() || "Student";
+        const studentReg  = document.getElementById("profileReg")?.textContent.trim()  || "N/A";
+
+        let out  = `FUTO Student Chatbot — Conversation Export\n`;
+        out     += `Student : ${studentName}\n`;
+        out     += `Reg No  : ${studentReg}\n`;
+        out     += `Date    : ${new Date().toLocaleString("en-NG")}\n`;
+        out     += "=".repeat(55) + "\n\n";
+
+        bubbles.forEach(b => {
+            const who = b.classList.contains("user-bubble") ? "YOU" : "FUTOBOT";
+            const tmp = document.createElement("div");
+            tmp.innerHTML = b.innerHTML;
+            out += `[${who}]\n${tmp.textContent.replace(/\n{3,}/g,"\n\n").trim()}\n\n`;
+        });
+
+        const a = document.createElement("a");
+        a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(out);
+        a.download = `FUTObot-chat-${Date.now()}.txt`;
+        a.click();
+    }
+
+
+    // ── 17. LIVE ANALYTICS ────────────────────────────────────────
+    async function refreshStats() {
+        try {
+            const res = await fetch("/stats");
+            if (!res.ok) return;
+            const d   = await res.json();
+            document.getElementById("statMsgs").textContent     = d.total_messages ?? "—";
+            document.getElementById("statFallback").textContent = d.fallback_count  ?? "—";
+            document.getElementById("statAcc").textContent      = d.model_acc       ?? "—";
+            document.getElementById("statUptime").textContent   = d.uptime          ?? "—";
+            document.getElementById("statUp").textContent       = d.upvotes         ?? "—";
+            document.getElementById("statDown").textContent     = d.downvotes       ?? "—";
+        } catch(_) {}
+    }
+    setInterval(refreshStats, 10_000);
+    refreshStats();
+
+
+    // ── 18. WELCOME MESSAGE ───────────────────────────────────────
+    window.addEventListener("load", () => {
+        const nameEl    = document.getElementById("profileName");
+        const firstName = nameEl ? nameEl.textContent.trim().split(" ")[0] : "Student";
+        setTimeout(() => {
+            appendMessage(
+                `👋 Hello ${firstName}! I'm **FUTObot**, your 24/7 FUTO Student Assistant.\n\n` +
+                `I'm here to help you with all your academic needs at FUTO.\n\n` +
+                `**What can I help you with?**\n` +
+                `📚 Registration  •  💰 Fees  •  🗓️ Timetable  •  🏠 Hostel\n` +
+                `📊 Results  •  ✏️ Exams  •  📄 Transcript  •  🏆 Scholarships`,
+                "bot", { source:"kb", intent:"general_greeting" }
+            );
+        }, 900);
+    });
+
+</script>
+</body>
+</html>
