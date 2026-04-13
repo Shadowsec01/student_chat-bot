@@ -1,0 +1,45 @@
+# =============================================================
+# render.yaml — Render.com Deployment Configuration
+# =============================================================
+# This file tells Render how to build and run FUTO Chatbot.
+# Place it in the ROOT of your GitHub repository.
+#
+# How to deploy:
+#   1. Push your repo to GitHub (include all 3 files + data_full.csv)
+#   2. Go to https://render.com → New → Web Service
+#   3. Connect your GitHub repo
+#   4. Render auto-detects render.yaml and applies settings below
+#   5. Click "Deploy" — your app will be live in ~3 minutes
+#
+# Your app URL will be: https://futobot.onrender.com (or similar)
+# =============================================================
+
+services:
+  - type: web                          # Web service (HTTP server)
+    name: futobot                      # Name shown in Render dashboard
+    runtime: python                    # Language runtime
+    plan: free                         # Free tier (750 hrs/month)
+    region: oregon                     # US-West; change to 'frankfurt' if preferred
+
+    # ── Build ──────────────────────────────────────────────────
+    buildCommand: pip install -r requirements.txt
+
+    # ── Start ──────────────────────────────────────────────────
+    # Render injects the $PORT env variable automatically.
+    # futo_chatbot.py reads os.environ.get("PORT", 5000) for this.
+    startCommand: gunicorn futo_chatbot:app
+
+    # ── Environment variables ───────────────────────────────────
+    envVars:
+      - key: FLASK_ENV
+        value: production              # disables debug mode in Flask
+      - key: PYTHON_VERSION
+        value: 3.13.0                  # use Python 3.13
+
+    # ── Health check ────────────────────────────────────────────
+    # Render pings /health to confirm the app started correctly.
+    # The /health route in futo_chatbot.py returns {"status":"ok"}.
+    healthCheckPath: /health
+
+    # ── Auto-deploy on push ─────────────────────────────────────
+    autoDeploy: true                   # redeploy whenever you push to main
